@@ -7,11 +7,15 @@ services:
     stop_signal: SIGINT
     build:
       context: .
+      args:
+        BOT_NAME: ${BOT_NAME}
+        TIMEZONE: ${TIMEZONE}
     working_dir: "/usr/src/app/${BOT_NAME}"
     volumes:
       - .:/usr/src/app/${BOT_NAME}
       - postgres_volume:/root/postgres_volume
     command: python3 -m bot
+    # command: mkdir /usr/src/app/${BOT_NAME}/source/voice && python3 -m bot
     restart: always
     env_file:
       - ".env"
@@ -20,7 +24,8 @@ services:
     depends_on:
       - postgres
       # - redis
-
+    stdin_open: true
+    tty: true
 
   # redis:
   #   image: redis:6.2-alpine
@@ -41,19 +46,18 @@ services:
     volumes:
       - postgres_volume:/var/lib/postgresql/data
     ports:
-      - 5432:5432
-    user: ${DB_USER}
+      - 5444:5432
+    user: ${POSTGRES_USER}
     environment:
       - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - tg_bot
 
-
 volumes:
   postgres_volume:
-  # redis_data:
+    # redis_data:
 
 
 networks:
